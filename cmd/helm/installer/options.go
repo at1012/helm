@@ -71,6 +71,12 @@ type Options struct {
 
 	// EnableHostNetwork installs Tiller with net=host.
 	EnableHostNetwork bool
+
+	// Wait if set, will wait until the Tiller Deployment and the Tiller Service are in ready state.
+	Wait bool
+
+	// Timeout is the time in seconds to wait for Tiller Deployment and Service to be ready.
+	Timeout int64
 }
 
 func (opts *Options) selectImage() string {

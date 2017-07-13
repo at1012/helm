@@ -79,6 +79,8 @@ type initCmd struct {
 	opts           installer.Options
 	kubeClient     kubernetes.Interface
 	serviceAccount string
+	wait           bool
+	timeout        int64
 }
 
 func newInitCmd(out io.Writer) *cobra.Command {
@@ -117,6 +119,8 @@ func newInitCmd(out io.Writer) *cobra.Command {
 
 	f.BoolVar(&i.opts.EnableHostNetwork, "net-host", false, "install Tiller with net=host")
 	f.StringVar(&i.serviceAccount, "service-account", "", "name of service account")
+	f.BoolVar(&i.wait, "wait", false, "if set, will wait until  Tiller Deployment and the Tiller Service are in ready state before marking the Helm initialization as successful. It will wait for as long as --timeout")
+	f.Int64Var(&i.timeout, "timeout", 300, "time in seconds to wait for Tiller Deployment and Service to be ready")
 
 	return cmd
 }
@@ -156,7 +160,8 @@ func (i *initCmd) run() error {
 	i.opts.UseCanary = i.canary
 	i.opts.ImageSpec = i.image
 	i.opts.ServiceAccount = i.serviceAccount
-
+	i.opts.Wait = i.wait
+	i.opts.Timeout = i.timeout
 	if settings.Debug {
 		writeYAMLManifest := func(apiVersion, kind, body string, first, last bool) error {
 			w := i.out
